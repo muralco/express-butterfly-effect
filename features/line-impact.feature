@@ -56,3 +56,13 @@ Scenario: nested assignment
     """
   When finding the symbols at line 2
   Then the symbol is "module.exports.a"
+
+Scenario: array assignment
+  Given a file with
+    """
+    module.exports = [
+      1,
+    ];
+    """
+  When finding the symbols at line 2
+  Then the symbol is "module.exports"

@@ -83,6 +83,39 @@ Scenario: call chain
   When finding the usages of "a"
   Then the symbol is "b"
 
+Scenario: call library method
+  Given a file with
+    """
+    function b() { a.find(() => true); }
+    """
+  When finding the usages of "a"
+  Then the symbol is "b"
+
+Scenario: recursive call
+  Given a file with
+    """
+    module.exports = a;
+    module.exports.b = promisify(module.exports);
+    """
+  When finding the usages of "a"
+  Then the symbols are "module.exports" and "module.exports.b"
+
+Scenario: array destruct
+  Given a file with
+    """
+    const [b, c] = a;
+    """
+  When finding the usages of "a"
+  Then the symbols are "b" and "c"
+
+Scenario: object destruct prop
+  Given a file with
+    """
+    const { b, c } = a;
+    """
+  When finding the usages of "a.x"
+  Then the symbols are empty
+
 # App
 
 Scenario: app

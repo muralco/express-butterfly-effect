@@ -1,5 +1,5 @@
 import { resolve } from 'path';
-import { DEFAULT } from './consts';
+import { ANONYMOUS, DEFAULT } from './consts';
 import { parseFile } from './files';
 import { findSymbols } from './line-impact';
 import { getRequiredSymbols } from './require-impact';
@@ -81,7 +81,10 @@ const recurseProcessFile = (
     usages,
   };
 
-  if (!exported.length && !(symbols.includes(DEFAULT) && appUsages.length)) {
+  if (!exported.length && !(
+    appUsages.length
+    && (symbols.includes(DEFAULT) || symbols.includes(ANONYMOUS))
+  )) {
     return [processedFile];
   }
 

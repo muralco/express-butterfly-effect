@@ -76,3 +76,19 @@ Scenario: impact in app method
     """
   When processing the impact for "./dir/index.js" at line 3
   Then the impacted endpoint is "post /prefix/path"
+
+Scenario: app method require
+  Given a file "./app.js" with
+    """
+    app.use('/prefix', require('./a'));
+    """
+  And a file "./a.js" with
+    """
+    app.post(
+      '/path',
+      require('./fn'),
+    );
+    module.exports = app;
+    """
+  When processing the impact for "./fn.js" at line 2
+  Then the impacted endpoint is "post /prefix/path"

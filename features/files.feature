@@ -60,3 +60,19 @@ Scenario: indirect app usage
     """
   When processing the impact for "./fn.js" at line 2
   Then the impacted endpoint is "get /prefix/path"
+
+Scenario: impact in app method
+  Given a file "./app.js" with
+    """
+    app.use('/prefix', require('./dir'));
+    """
+  And a file "./dir/index.js" with
+    """
+    app.post(
+      '/path',
+      doStuff,
+    );
+    module.exports = app;
+    """
+  When processing the impact for "./dir/index.js" at line 3
+  Then the impacted endpoint is "post /prefix/path"

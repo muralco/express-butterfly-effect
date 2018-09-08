@@ -66,3 +66,16 @@ Scenario: array assignment
     """
   When finding the symbols at line 2
   Then the symbol is "module.exports"
+
+Scenario: call
+  Given a file with
+    """
+    app.post(
+      '/path',
+      doStuff,
+    );
+    module.exports = app;
+    """
+  When finding the symbols at line 2
+  Then the symbol maps to app.post('/path')
+

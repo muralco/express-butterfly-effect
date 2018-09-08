@@ -1,8 +1,7 @@
 import { loadFiles } from './files';
 import { getImpactedFile } from './impacted';
 import { processFiles } from './process';
-import { getAppUsage } from './usages';
-import { isNotNull, uniq } from './util';
+import { getAppUsage, isNotNull, uniq } from './util';
 
 export default (
   globs: string[],

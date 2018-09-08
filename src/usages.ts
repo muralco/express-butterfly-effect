@@ -1,11 +1,12 @@
-import { ANY, APP } from './consts';
-import { AppUsage, Token } from './types';
+import { ANY } from './consts';
+import { Token } from './types';
 import {
+  extractAppUsageFromToken,
   flatten,
-  getLiteralValue,
   getName,
   getObjectName,
   isNotNull,
+  setAppUsage,
 } from './util';
 import walk from './walk';
 
@@ -68,18 +69,7 @@ const tokenUsesSymbol = (token: Token, name: string[]): Usage[] => {
     .map(t => ({ ...t, path: [token, ...t.path] }));
 };
 
-export const setAppUsage = (method: string, path: string | null) =>
-  `${APP}(${method}|${path})`;
-
-export const getAppUsage = (s: string): AppUsage | null => {
-  const data = s.split(APP)[1];
-  if (!data) return null;
-  const [method, path] = data.substring(1, data.length - 1).split('|', 2);
-  return { method, path: path === 'null' ? null : path };
-};
-
 const getUsageName = (usage: Usage): string[] => {
-
   const arrayPatterns = usage.path
     .map(t =>
       t.type === 'VariableDeclarator' && t.id.type === 'ArrayPattern'
@@ -99,17 +89,9 @@ const getUsageName = (usage: Usage): string[] => {
           if (token.expression.type === 'AssignmentExpression') {
             return getObjectName(token.expression.left).join('.');
           }
-          if (token.expression.type === 'CallExpression'
-            && token.expression.callee.type === 'MemberExpression'
-            && token.expression.callee.object.type === 'Identifier'
-            && token.expression.callee.object.name === 'app'
-            && token.expression.callee.property.type === 'Identifier'
-          ) {
-            const method = token.expression.callee.property.name;
-            const path = getLiteralValue(token.expression.arguments[0]);
-
-            (token.expression.arguments[0] as any).value;
-            return `${setAppUsage(method, path)}.NOTHING_AFTER_THIS`;
+          const appUsage = extractAppUsageFromToken(token);
+          if (appUsage) {
+            return `${setAppUsage(appUsage)}.NOTHING_AFTER_THIS`;
           }
           return 'NOTHING_AFTER_THIS';
         case 'ObjectMethod':

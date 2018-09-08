@@ -1,5 +1,5 @@
-import { ANY } from './consts';
-import { Require, Token } from './types';
+import { ANY, APP } from './consts';
+import { AppUsage, Require, Token } from './types';
 
 export const flatten = <T>(arr: T[][]): T[] =>
   ([] as T[]).concat(...arr);
@@ -76,3 +76,29 @@ export const defaultExportIsApp = (tokens: Token[]) => tokens.some(t =>
 
 export const requireMatches = (path: string) => (r: Require) =>
   `${r.path}.js` === path || `${r.path}/index.js` === path;
+
+export const setAppUsage = ({ method, path }: AppUsage) =>
+  `${APP}(${method}|${path})`;
+
+export const getAppUsage = (s: string): AppUsage | null => {
+  const data = s.split(APP)[1];
+  if (!data) return null;
+  const [method, path] = data.substring(1, data.length - 1).split('|', 2);
+  return { method, path: path === 'null' ? null : path };
+};
+
+export const extractAppUsageFromToken = (token: Token): AppUsage | null => {
+  if (token.type === 'ExpressionStatement'
+    && token.expression.type === 'CallExpression'
+    && token.expression.callee.type === 'MemberExpression'
+    && token.expression.callee.object.type === 'Identifier'
+    && token.expression.callee.object.name === 'app'
+    && token.expression.callee.property.type === 'Identifier'
+    ) {
+    const method = token.expression.callee.property.name;
+    const path = getLiteralValue(token.expression.arguments[0]);
+    return { method, path };
+  }
+
+  return null;
+};

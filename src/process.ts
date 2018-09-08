@@ -10,8 +10,8 @@ import {
   ParsedFile,
   ProcessedFile,
 } from './types';
-import { findUsages, getAppUsage } from './usages';
-import { flatten, isNotNull, requireMatches, uniq } from './util';
+import { findUsages } from './usages';
+import { flatten, getAppUsage, isNotNull, requireMatches, uniq } from './util';
 
 const processFileSymbols = (
   files: ParsedFile[],

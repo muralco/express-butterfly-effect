@@ -1,5 +1,11 @@
 import { Token } from './types';
-import { getName, getObjectName, tokenAt } from './util';
+import {
+  extractAppUsageFromToken,
+  getName,
+  getObjectName,
+  setAppUsage,
+  tokenAt,
+} from './util';
 
 export const findSymbols = (
   tokens: Token[],
@@ -22,6 +28,8 @@ export const findSymbols = (
         }
         return [object.join('.')];
       }
+      const appUsage = extractAppUsageFromToken(token);
+      if (appUsage) return [setAppUsage(appUsage)];
       return [];
     case 'FunctionDeclaration':
     case 'ClassDeclaration':

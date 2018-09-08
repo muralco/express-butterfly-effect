@@ -9,7 +9,8 @@ import { processFiles } from './process';
 import { getRequiredSymbols } from './require-impact';
 import { findRequires } from './requires';
 import { LoadedFile, ProcessedFile, Require } from './types';
-import { findUsages, getAppUsage, setAppUsage } from './usages';
+import { findUsages } from './usages';
+import { getAppUsage, setAppUsage } from './util';
 
 const splitList = (s: string) => {
   if (s === 'empty') return [];
@@ -164,7 +165,7 @@ const mapUsages = (s: string) => {
   const [method, path] = (/app.(\w+)\((?:['"]([^'"]+)['"])?\)/.exec(s) || [])
     .slice(1);
   if (!method) return s;
-  return setAppUsage(method, path);
+  return setAppUsage({ method, path });
 };
 
 Then(/the impact for "([^"]+)" has( no)? usages?(.*) and( no)? exports?(.*)/, (

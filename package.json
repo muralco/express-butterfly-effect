@@ -1,6 +1,6 @@
 {
   "name": "express-butterfly-effect",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Compute the high-level endpoint impact of tiny code changes",
   "repository": {
     "type": "git",

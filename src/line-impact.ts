@@ -1,11 +1,21 @@
 import { Token } from './types';
 import {
   extractAppUsageFromToken,
+  flatten,
   getName,
   getObjectName,
   setAppUsage,
   tokenAt,
 } from './util';
+
+const getDeclaratorNames = (token: Token): string[] => {
+  if (token.type === 'VariableDeclarator'
+    && token.id.type === 'ArrayPattern'
+  ) {
+    return token.id.elements.map(getName);
+  }
+  return [getName(token)];
+};
 
 export const findSymbols = (
   tokens: Token[],
@@ -16,7 +26,7 @@ export const findSymbols = (
 
   switch (token.type) {
     case 'VariableDeclaration':
-      return token.declarations.map(n => getName(n));
+      return flatten(token.declarations.map(getDeclaratorNames));
     case 'ExpressionStatement':
       if (token.expression.type === 'AssignmentExpression') {
         const assignment = token.expression;

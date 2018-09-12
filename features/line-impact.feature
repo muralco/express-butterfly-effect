@@ -79,3 +79,11 @@ Scenario: call
   When finding the symbols at line 2
   Then the symbol maps to app.post('/path')
 
+Scenario: array pattern
+  Given a file with
+    """
+    const [first, ...rest] = arr;
+    """
+  When finding the symbols at line 1
+  Then the symbols are "first" and "rest"
+

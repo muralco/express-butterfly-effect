@@ -33,6 +33,8 @@ export const getName = (token: Token): string => {
       return getName(token.id);
     case 'FunctionDeclaration':
       return token.id ? getName(token.id) : '';
+    case 'RestElement':
+      return getName(token.argument);
     case 'Identifier':
       return token.name;
     case 'ObjectPattern':
@@ -62,16 +64,33 @@ export const getLiteralValue = (token: Token | null): string | null =>
     ? token.value
     : null;
 
-export const defaultExportIsApp = (tokens: Token[]) => tokens.some(t =>
+const isModuleExports = (t: Token): boolean =>
+  t.type === 'MemberExpression'
+  && t.object.type === 'Identifier'
+  && t.object.name === 'module'
+  && t.property.type === 'Identifier'
+  && t.property.name === 'exports';
+
+const isModuleExportsEqualApp = (t: Token): boolean =>
   t.type === 'ExpressionStatement'
   && t.expression.type === 'AssignmentExpression'
-  && t.expression.left.type === 'MemberExpression'
-  && t.expression.left.object.type === 'Identifier'
-  && t.expression.left.object.name === 'module'
-  && t.expression.left.property.type === 'Identifier'
-  && t.expression.left.property.name === 'exports'
+  && isModuleExports(t.expression.left)
   && t.expression.right.type === 'Identifier'
-  && t.expression.right.name === 'app',
+  && t.expression.right.name === 'app';
+
+const isAppEqualModuleExportsEqualRequire = (t: Token) =>
+  t.type === 'VariableDeclaration'
+  && t.declarations.some(d =>
+    d.id.type === 'Identifier'
+    && d.id.name === 'app'
+    && !!d.init
+    && d.init.type === 'AssignmentExpression'
+    && isModuleExports(d.init.left),
+  );
+
+export const defaultExportIsApp = (tokens: Token[]) => tokens.some(t =>
+  isModuleExportsEqualApp(t)
+  || isAppEqualModuleExportsEqualRequire(t),
 );
 
 export const requireMatches = (path: string) => (r: Require) =>

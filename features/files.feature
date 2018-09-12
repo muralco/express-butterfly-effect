@@ -92,3 +92,19 @@ Scenario: app method require
     """
   When processing the impact for "./fn.js" at line 2
   Then the impacted endpoint is "post /prefix/path"
+
+Scenario: multi-assign
+  Given a file "./app.js" with
+    """
+    app.use('/prefix', require('./a'));
+    """
+  And a file "./a.js" with
+    """
+    const app = module.exports = require('express')();
+    app.post(
+      '/path',
+      doStuff,
+    );
+    """
+  When processing the impact for "./a.js" at line 3
+  Then the impacted endpoint is "post /prefix/path"

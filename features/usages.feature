@@ -108,6 +108,14 @@ Scenario: array destruct
   When finding the usages of "a"
   Then the symbols are "b" and "c"
 
+Scenario: array destruct rest
+  Given a file with
+    """
+    const [b, ...c] = a;
+    """
+  When finding the usages of "a"
+  Then the symbols are "b" and "c"
+
 Scenario: object destruct prop
   Given a file with
     """

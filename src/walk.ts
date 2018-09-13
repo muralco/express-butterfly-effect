@@ -85,6 +85,8 @@ export default <T>(fn: (t: Token[]) => T) => (token: Token) => {
       return fn(token.properties);
     case 'ArrayPattern':
       return fn(token.elements);
+    case 'RestElement':
+      return fn([token.argument]);
     case 'BooleanLiteral':
     case 'BreakStatement':
     case 'EmptyStatement':
